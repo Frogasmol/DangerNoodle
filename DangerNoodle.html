@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Danger Noodle</title>
+<style>
+body {
+    background-color: #202020;
+    color: white;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+div {
+    background-color: #000;
+    /* margin: 2px; */
+    width: 25px;
+    height: 25px;
+}
+main {
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    margin: 3%;
+    /* width: 40%; */
+}
+article {
+   font-family: Verdana, Geneva, Tahoma, sans-serif;
+   font-size: 1.5em;
+   color: #fff;
+   margin: 3%;
+}
+</style>
+
+</head>
+
+<body>
+    <main>
+    </main>
+
+    <article>
+        Mangez la pomme en évitant les bords et vous-même!<br><br>
+        Utilisez les touches WASD ou les flèches pour changer de direction<br><br>
+        Appuyez sur une touche pour commencer
+    </article>   
+
+</body>
+
+<script>
+
+for(i=1;i<401;i++) {
+        document.querySelector(`main`).innerHTML += `<div id="c${i}"><p></p></div>`;
+};
+
+const noodle1=[21,22,23,41,44,48,51,55,56,57,61,64,68,69,71,75,76,81,84,88,90,91,95,101,102,103,108,111,115,116,117,141,145,161,162,165,169,170,171,175,181,183,185,189,191,195,201,204,205,209,211,215,221,225,229,230,231,235,236,237];
+
+const noodle2=[45,46,47,52,53,54,58,59,60,65,67,72,78,80,85,86,87,92,94,98,99,105,107,112,113,114,118,120,166,167,168,172,173,178,179,180,186,188,192,194,198,199,206,208,212,214,218,226,227,228,232,233,238,239,240];
+
+const couleurNoodle1="#8070d8";
+const couleurNoodle2="#cccccc";
+
+const bordure=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,40,41,60,61,80,81,100,101,120,121,140,141,160,161,180,181,200,201,220,221,240,241,260,261,280,281,300,301,320,321,340,341,360,361,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400];
+
+var snekColor="rgb(150, 235, 180)";
+var appleColor="rgb(200, 0, 0)";
+var backColor="rgb(0, 0, 0)";
+
+var snek=[107,106,105];
+var alive=true;
+var apple=0;
+var nextApple=0;
+var direction="right";
+var next=snek[0]+1;
+var score=0;
+var a=0;
+var vitesse=200;
+
+
+function dessineSnek(item, index) {
+    document.querySelector("#c"+item).style.backgroundColor = snekColor;
+};
+
+function wipeBoard(){
+    for(i=1;i<401;i++) {        
+        document.querySelector(`#c${i}`).style.backgroundColor = backColor;
+    };
+};
+
+function dessine(chose,couleur){
+    chose.forEach(function(item){
+        document.querySelector("#c"+item).style.backgroundColor = couleur;
+    });
+};
+function directionListnener(){
+    document.addEventListener('keydown',function(e){
+        var touche = e.which;
+        console.log(touche);
+        switch(touche) {
+            case 38 : direction = "up";
+            break;
+            case 40 : direction = "down";
+            break;
+            case 37 :  direction = "left";
+            break;
+            case 39 : direction = "right";
+            break;
+            
+            case 87 : direction = "up";
+            break;
+            case 83 : direction = "down";
+            break;
+            case 65 :  direction = "left";
+            break;
+            case 68 : direction = "right";
+            break;
+        };
+    });
+};
+
+function checkScore(){
+    if (score==5) {
+        snekColor="rgb(130, 150, 200)";
+        appleColor="rgb(30, 110, 50)";
+        snek.forEach(dessineSnek);
+        bordure.forEach(dessineSnek);
+        vitesse=180;
+    };
+    if (score==10) {
+        snekColor="rgb(130, 10, 180)";
+        appleColor="rgb(220, 220, 0)";
+        snek.forEach(dessineSnek);
+        bordure.forEach(dessineSnek);
+        vitesse=160;
+    };
+    if (score==15) {
+        snekColor="rgb(140, 10, 10)";
+        appleColor="rgb(100, 220, 250)";
+        snek.forEach(dessineSnek);
+        bordure.forEach(dessineSnek);
+        vitesse=140;
+    };
+    if (score==20) {
+        snekColor="rgb(210, 210, 150)";
+        appleColor="rgb(0, 70, 0)";
+        snek.forEach(dessineSnek);
+        bordure.forEach(dessineSnek);
+        vitesse=120;
+    };
+    if (score==25) {
+        snekColor="rgb(40, 40, 40)";
+        appleColor="rgb(230, 0, 230)";
+        snek.forEach(dessineSnek);
+        bordure.forEach(dessineSnek);
+        vitesse=100;
+    };
+}
+
+function domHandler(e){
+    e.target.removeEventListener(e.type, arguments.callee);
+    wipeBoard();
+    demarrage();
+};
+
+function deplacementSnek(){
+
+    switch(direction){
+        case "up": next = (snek[0]-20);
+        break;
+        case "down": next = (snek[0]+20);
+        break;
+        case "left": next = (snek[0]-1);
+        break;
+        case "right": next = (snek[0]+1);
+        break;
+    };
+
+    if (document.querySelector("#c"+next).style.backgroundColor == snekColor){alive=false} 
+        else if (document.querySelector("#c"+next).style.backgroundColor == appleColor){
+            score=score+1;
+            snek.unshift(next);
+            document.querySelector("#c"+next).style.backgroundColor = snekColor;
+            switch(direction){
+                case "up": next = (snek[0]-20);
+                break;
+                case "down": next = (snek[0]+20);
+                break;
+                case "left": next = (snek[0]-1);
+                break;
+                case "right": next = (snek[0]+1);
+                break;
+            };
+            while(a==0){
+                nextApple=Math.floor((Math.random() * 400) + 1);
+                if (document.querySelector("#c"+nextApple).style.backgroundColor == snekColor || nextApple == 22 || nextApple == 39 || nextApple == 362 || nextApple == 379){a=0;} else a=1;
+            }; 
+            a=0;
+            apple=nextApple;
+
+            checkScore();
+
+            document.querySelector("#c"+apple).style.backgroundColor = appleColor;
+        } else {
+            document.querySelector("#c"+next).style.backgroundColor = snekColor;
+            snek.unshift(next);
+            let snekTail="#c"+snek.pop();
+            document.querySelector(snekTail).style.backgroundColor = backColor;
+        };
+};
+
+function demarrage(){
+    document.querySelector("body").style.backgroundColor=backColor;
+    snek=[107,106,105];
+    snekColor="rgb(150, 235, 180)";
+    appleColor="rgb(200, 0, 0)";
+    apple=0;
+    nextApple=0;
+    alive=true;
+    direction="right";
+    vitesse=200;
+    score=0;
+    a=0;
+    snek.forEach(dessineSnek);
+    bordure.forEach(dessineSnek);
+    while(a==0){
+        apple=Math.floor((Math.random() * 400) + 1);
+        if (document.querySelector("#c"+apple).style.backgroundColor == snekColor){
+            a=0;
+        } else a=1;
+    }; a=0; 
+    document.querySelector("#c"+apple).style.backgroundColor = appleColor;
+
+    (function moveSnek(){
+
+        setTimeout(function(){
+
+            document.querySelector("article").innerHTML = "Votre score: "+score+" pommes";
+
+            directionListnener();
+
+            deplacementSnek();
+
+                            
+            if (alive) {          
+                moveSnek();       
+            } else {
+                document.querySelector("article").innerHTML = "Vous êtes mort! <br> Votre score: "+score+" pommes! <br> Cliquez pour rejouer.";
+                document.querySelector("body").addEventListener("keypress", domHandler);
+                document.querySelector("body").style.backgroundColor="rgb(230, 0, 0)";
+            };
+
+        }, vitesse);
+    })();
+};
+
+dessine(noodle1,couleurNoodle1);
+dessine(noodle2,couleurNoodle2);
+
+document.querySelector("body").addEventListener("keypress", domHandler);
+
+</script>
+
+</html>
